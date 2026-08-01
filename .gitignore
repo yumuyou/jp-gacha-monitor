@@ -1,0 +1,13 @@
+# 私密配置 (API key), 绝不进仓库
+config.local.json
+
+# 本地积累的数据与产出 (体积大且是个人数据, 各自部署后自行生成)
+data/
+reports/
+
+# 大文件 / 杂项
+*.xlsx
+.DS_Store
+__pycache__/
+*.pyc
+.claude/settings.local.json

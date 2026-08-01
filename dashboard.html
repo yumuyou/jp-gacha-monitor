@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>日本二游竞品监测面板</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{--bg:#0f1117;--card:#1a1d27;--card2:#232736;--txt:#e8eaf2;--sub:#8b90a5;--acc:#7c9aff;--good:#4ade80;--bad:#f87171;--gold:#fbbf24;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font:14px/1.6 -apple-system,"Hiragino Sans","PingFang SC",sans-serif;padding:20px}
+h1{font-size:20px;margin-bottom:4px}
+.sub{color:var(--sub);font-size:12px;margin-bottom:16px}
+.sub .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:5px;animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid #2a2e3f;border-radius:10px;padding:10px 12px;cursor:pointer;transition:.15s}
+.card:hover{border-color:var(--acc);transform:translateY(-1px)}
+.card.active{border-color:var(--acc);background:var(--card2)}
+.card .name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .name .star{color:var(--gold)}
+.card .jp{color:var(--sub);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ranks{display:flex;gap:12px;margin-top:6px;font-size:12px}
+.ranks b{font-size:17px;font-variant-numeric:tabular-nums}
+.ranks .lbl{color:var(--sub);font-size:10px}
+.out{color:var(--sub)}
+.top10{color:var(--gold)} .top30{color:var(--good)}
+#detail{background:var(--card);border:1px solid #2a2e3f;border-radius:12px;padding:18px;min-height:200px}
+#detail h2{font-size:17px;margin-bottom:2px}
+#detail .meta{color:var(--sub);font-size:12px;margin-bottom:12px}
+.cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:1100px){.cols{grid-template-columns:1fr}}
+.col h3{font-size:13px;color:var(--acc);border-bottom:1px solid #2a2e3f;padding-bottom:6px;margin-bottom:8px}
+.item{padding:7px 0;border-bottom:1px solid #232736;font-size:12.5px}
+.item .d{color:var(--sub);font-size:11px}
+.item a{color:var(--txt);text-decoration:none}
+.item a:hover{color:var(--acc)}
+.stars{color:var(--gold);font-size:11px}
+.neg .stars{color:var(--bad)}
+.views{color:var(--sub);font-size:11px}
+.reply{opacity:.55}
+#spark{margin:8px 0 14px}
+.vnote{background:var(--card2);border-radius:8px;padding:10px;font-size:12px;color:var(--sub);margin-bottom:12px;white-space:pre-wrap}
+.vnote b{color:var(--txt)}
+.loading{color:var(--sub);padding:20px;text-align:center}
+.err{color:var(--bad);font-size:12px}
+button{background:var(--card2);color:var(--txt);border:1px solid #2a2e3f;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px}
+button:hover{border-color:var(--acc)}
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid #2a2e3f;padding-bottom:0}
+.tab{background:none;border:none;border-bottom:2px solid transparent;border-radius:0;padding:8px 16px;font-size:14px;color:var(--sub)}
+.tab:hover{color:var(--txt);border-color:transparent}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+.rmdot{position:absolute;top:50%;transform:translate(-50%,-50%);cursor:default}
+.rmdot:hover{filter:brightness(1.4);z-index:5}
+#rmTip{display:none;position:fixed;z-index:99;max-width:380px;background:#252a3a;border:1px solid var(--acc);border-radius:8px;padding:8px 11px;font-size:12px;line-height:1.55;color:var(--txt);box-shadow:0 6px 24px rgba(0,0,0,.5);pointer-events:none;white-space:pre-wrap}
+#rmTip b{color:var(--acc)}
+.chip{border-radius:14px;padding:3px 11px;font-size:11px}
+.chip.on{border-color:var(--acc);color:var(--acc);font-weight:600}
+</style>
+</head>
+<body>
+<h1>🎌 日本二游竞品监测面板</h1>
+<div class="sub"><span class="dot"></span>数据每10-15分钟自动刷新 · 榜单=日区游戏类畅销榜 · <span id="upd">加载中…</span>
+ <button onclick="loadAll(true)" style="margin-left:8px">立即刷新</button></div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="monitor" onclick="switchTab('monitor')">📊 监测面板</button>
+  <button class="tab" data-tab="roadmap" onclick="switchTab('roadmap')">🗓 版本Roadmap</button>
+  <button class="tab" data-tab="digest" onclick="switchTab('digest')">📰 周报</button>
+</div>
+
+<div id="page-monitor">
+<div class="grid" id="grid"><div class="loading">加载竞品名单…</div></div>
+
+<div id="buzz" style="margin-bottom:20px">
+  <h2 style="font-size:16px;margin-bottom:8px">🔥 高曝光营销动作 <span style="color:var(--sub);font-size:12px;font-weight:400">全竞品官推/官方YT · 自动按营销类别归类(转抽/联动/线下/直播/声优KOL/周年/二创/主题曲等) · 30分钟缓存</span>
+    <button onclick="loadBuzz(this)" style="margin-left:8px">加载 (后台抓取, 不影响页面)</button></h2>
+  <div id="buzzBody" style="display:none">
+    <div id="buzzChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+    <div class="cols" style="grid-template-columns:1fr 1fr">
+      <div class="col"><h3>𝕏 高互动推文 Top20 (按点赞)</h3><div id="buzzTweets"></div></div>
+      <div class="col"><h3>▶ 高观看视频 Top20</h3><div id="buzzVideos"></div></div>
+    </div>
+  </div>
+</div>
+
+<div id="detail"><div class="loading">点击上方任意竞品卡片，查看排名走势、版本更新、最新评论、官方YouTube与X动态</div></div>
+</div><!-- /page-monitor -->
+
+<div id="page-roadmap" style="display:none">
+  <div class="sub" style="margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <button onclick="rmShiftYear(-1)">← 上一年</button>
+    <b id="rmYearLbl" style="color:var(--txt);font-size:14px"></b>
+    <button onclick="rmShiftYear(1)">下一年 →</button>
+    <span>全年时间轴 · 左右拖动滚动条查看 · 悬停节点看详情</span>
+    <button onclick="loadRoadmap(this)">刷新</button></div>
+  <div id="roadmapBody"><div class="loading">加载中…</div></div>
+</div><!-- /page-roadmap -->
+
+<div id="page-digest" style="display:none">
+  <div class="sub" style="margin-bottom:10px">聚合最近7天快照 + 当日X缓存 + AI中文提炼, 生成可直接发飞书群的纯文本周报
+    <label style="margin-left:10px;font-size:12px;cursor:pointer"><input type="checkbox" id="dgX"> 实时抓官推 (调用monid, 约$0.04/次)</label>
+    <button id="dgBtn" onclick="runDigest(this)" style="margin-left:8px">生成本周报</button>
+    <button id="dgCopy" onclick="copyDigest(this)" style="display:none;margin-left:4px">复制全文</button></div>
+  <pre id="dgLog" style="display:none;background:var(--card2);border-radius:8px;padding:10px;font-size:11px;color:var(--sub);max-height:160px;overflow:auto;white-space:pre-wrap;margin-bottom:10px"></pre>
+  <pre id="dgText" style="display:none;background:var(--card);border:1px solid #2a2e3f;border-radius:12px;padding:18px 22px;font-size:13px;line-height:1.75;white-space:pre-wrap;margin-bottom:14px"></pre>
+  <h2 style="font-size:15px;margin-bottom:8px">🗂 历史周报存档</h2>
+  <div id="dgList" class="loading">加载中…</div>
+</div><!-- /page-digest -->
+
+<script>
+let GAMES=[], CHARTS={grossing:{},free:{}}, current=null;
+
+const $=s=>document.querySelector(s);
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rankCls=r=>!r?'out':r<=10?'top10':r<=30?'top30':'';
+const fmtR=r=>r?('#'+r):'圏外';
+
+const API_BASE=location.protocol==='file:'?'http://127.0.0.1:8642':'';
+async function api(p){
+  let r;
+  try{r=await fetch(API_BASE+p)}
+  catch(e){throw new Error('连不上后台服务(127.0.0.1:8642)，请确认 server.py 在运行')}
+  if(!r.ok)throw new Error(p+' '+r.status);
+  return r.json()
+}
+
+async function loadAll(force){
+  try{
+    if(!GAMES.length) GAMES=await api('/api/games');
+    CHARTS=await api('/api/charts'+(force?'?f='+Date.now():''));
+    renderGrid();
+    $('#upd').textContent='榜单更新: '+new Date().toLocaleTimeString('zh',{hour12:false});
+    if(current) showDetail(current,true);
+  }catch(e){$('#upd').innerHTML='<span class="err">刷新失败: '+esc(e.message)+'</span>'}
+}
+
+function renderGrid(){
+  const g=$('#grid'); g.innerHTML='';
+  const sorted=[...GAMES].sort((a,b)=>{
+    const ra=CHARTS.grossing[a.appId]||999, rb=CHARTS.grossing[b.appId]||999;
+    return ra-rb;
+  });
+  for(const gm of sorted){
+    const gr=CHARTS.grossing[gm.appId], fr=CHARTS.free[gm.appId];
+    const el=document.createElement('div');
+    el.className='card'+(current&&current.cn===gm.cn?' active':'');
+    el.innerHTML=`<div class="name">${gm.cn===MY?'<span class="star">⭐</span> ':''}${esc(gm.cn)}</div>
+      <div class="jp">${esc(gm.jp)}</div>
+      <div class="ranks">
+        <div><b class="${rankCls(gr)}">${fmtR(gr)}</b><div class="lbl">畅销</div></div>
+        <div><b class="${rankCls(fr)}">${fmtR(fr)}</b><div class="lbl">免费</div></div>
+        <div style="margin-left:auto;font-size:10px;color:var(--sub)">${esc(gm.origin||'')}</div>
+      </div>`;
+    el.onclick=()=>showDetail(gm);
+    g.appendChild(el);
+  }
+}
+
+function spark(hist){
+  if(!hist.length)return'';
+  const w=560,h=60,pad=4;
+  const vals=hist.map(x=>x.grossing);
+  const max=Math.max(...vals.filter(Boolean),100);
+  const pts=hist.map((x,i)=>{
+    const px=pad+i*(w-2*pad)/Math.max(hist.length-1,1);
+    const py=x.grossing?pad+(x.grossing-1)*(h-2*pad)/max:h-pad;
+    return{px,py,r:x.grossing,d:x.date};
+  });
+  const line=pts.filter(p=>p.r).map((p,i)=>(i?'L':'M')+p.px.toFixed(1)+','+p.py.toFixed(1)).join(' ');
+  const dots=pts.map(p=>`<circle cx="${p.px.toFixed(1)}" cy="${p.py.toFixed(1)}" r="2.5" fill="${p.r?'#7c9aff':'#444'}"><title>${p.d}: ${p.r?'#'+p.r:'圏外'}</title></circle>`).join('');
+  return `<svg id="spark" width="${w}" height="${h}" style="max-width:100%"><path d="${line}" stroke="#7c9aff" fill="none" stroke-width="1.5"/>${dots}</svg>
+  <div class="d" style="color:var(--sub);font-size:11px">畅销榜排名历史 (${hist[0].date} ~ ${hist[hist.length-1].date}, 越高=排名越前)</div>`;
+}
+
+async function showDetail(gm,soft){
+  current=gm;
+  if(!soft){renderGrid();$('#detail').innerHTML='<div class="loading">抓取 '+esc(gm.cn)+' 的实时数据…</div>'}
+  const jobs={hist:api('/api/history?game='+encodeURIComponent(gm.cn))};
+  if(gm.appId) jobs.detail=api('/api/detail?app='+gm.appId);
+  if(gm.yt_channel) jobs.yt=api('/api/youtube?ch='+gm.yt_channel);
+  if(gm.x) jobs.x=api('/api/x?user='+encodeURIComponent(gm.x));
+  const res={};
+  await Promise.all(Object.entries(jobs).map(async([k,p])=>{try{res[k]=await p}catch(e){res[k+'_err']=e.message}}));
+  if(current.cn!==gm.cn)return;
+
+  const meta=res.detail&&res.detail.meta, revs=(res.detail&&res.detail.reviews)||[];
+  const gr=CHARTS.grossing[gm.appId];
+  let h=`<h2>${gm.cn===MY?'⭐ ':''}${esc(gm.cn)} <span style="color:var(--sub);font-weight:400;font-size:13px">${esc(gm.jp)}</span></h2>
+  <div class="meta">${esc(gm.tags)} · 畅销榜 ${fmtR(gr)} · 商店评分 ${meta?`${meta.rating??'-'} (${(meta.ratingCount||0).toLocaleString()}件)`:'-'}
+   · <a style="color:var(--acc)" href="https://x.com/${esc(gm.x||'')}" target="_blank">@${esc(gm.x||'-')}</a></div>`;
+  h+=spark(res.hist||[]);
+  if(meta&&meta.version){
+    h+=`<div class="vnote"><b>当前版本 v${esc(meta.version)}</b> (${esc(meta.versionDate)})\n${esc(meta.releaseNotes||'(无更新说明)')}</div>`;
+  }
+  h+='<div class="cols">';
+  // X
+  h+='<div class="col"><h3>𝕏 官推动态</h3>';
+  const tweets=(res.x||[]).filter(t=>!t.reply);
+  if(tweets.length){for(const t of tweets.slice(0,8)){
+    h+=`<div class="item"><a href="${esc(t.url)}" target="_blank">${esc(t.text.slice(0,110))}${t.text.length>110?'…':''}</a><div class="d">${esc(t.date)}</div></div>`;
+  }}else h+=`<div class="item d">${res.x_err?'抓取失败(nitter限流, 稍后重试)':'暂无数据'}</div>`;
+  h+='</div>';
+  // YouTube
+  h+='<div class="col"><h3>▶ YouTube 营销内容</h3>';
+  if((res.yt||[]).length){for(const v of res.yt.slice(0,8)){
+    h+=`<div class="item"><a href="https://youtu.be/${v.videoId}" target="_blank">${esc(v.title)}</a>
+    <div class="d">${v.published} <span class="views">${v.views?'· '+v.views.toLocaleString()+' 次观看':''}</span></div></div>`;
+  }}else h+=`<div class="item d">${res.yt_err?'抓取失败(检查代理)':'暂无数据'}</div>`;
+  h+='</div>';
+  // Reviews
+  h+='<div class="col"><h3>💬 最新日区评论</h3>';
+  if(revs.length){for(const r of revs.slice(0,8)){
+    h+=`<div class="item ${r.rating<=2?'neg':''}"><span class="stars">${'★'.repeat(r.rating||0)}</span> <b style="font-size:12px">${esc(r.title)}</b>
+    <div>${esc((r.body||'').slice(0,100))}${(r.body||'').length>100?'…':''}</div><div class="d">${esc(r.date)}${r.votes?' · '+r.votes+'人觉得有用':''}</div></div>`;
+  }}else h+='<div class="item d">暂无评论数据</div>';
+  h+='</div></div>';
+  $('#detail').innerHTML=h;
+}
+
+async function loadBuzz(btn){
+  if(btn){btn.disabled=true;btn.textContent='抓取中…'}
+  try{
+    const d=await api('/api/buzz');
+    if(d.building){
+      if(btn){btn.textContent='后台抓取中 '+(d.progress||'')+' (页面可正常使用)'}
+      if(d.data)renderBuzz(d.data);
+      setTimeout(()=>loadBuzz(btn),5000);
+      return;
+    }
+    renderBuzz(d);
+    if(btn){btn.textContent='刷新';btn.disabled=false}
+  }catch(e){
+    if(btn){btn.textContent='失败, 点击重试';btn.disabled=false}
+  }
+}
+
+let BUZZ=null, buzzCat='all';
+function renderBuzz(d){
+    BUZZ=d;
+    const L=d.catLabels||{};
+    // 类别筛选chips: 按该类别下推文+视频总数排序
+    const cnt={};
+    for(const t of (d.tweets||[]))cnt[t.cat||'other']=(cnt[t.cat||'other']||0)+1;
+    for(const v of (d.videos||[]))cnt[v.cat||'other']=(cnt[v.cat||'other']||0)+1;
+    const cats=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);
+    let ch=`<button class="chip${buzzCat==='all'?' on':''}" onclick="buzzCat='all';renderBuzz(BUZZ)">全部</button>`;
+    for(const c of cats)
+      ch+=`<button class="chip${buzzCat===c?' on':''}" onclick="buzzCat='${c}';renderBuzz(BUZZ)">${esc(L[c]||c)} ${cnt[c]}</button>`;
+    $('#buzzChips').innerHTML=ch;
+    const pass=x=>buzzCat==='all'||(x.cat||'other')===buzzCat;
+    const badge=c=>`<span style="background:var(--card2);border:1px solid #343950;border-radius:4px;padding:0 5px;font-size:10px;color:var(--sub)">${esc(L[c]||'其他')}</span>`;
+    let th='';
+    for(const t of (d.tweets||[]).filter(pass).slice(0,20)){
+      th+=`<div class="item"><b style="color:var(--gold)">${(t.likes??0).toLocaleString()}❤</b>
+        <span style="color:var(--acc);font-size:11px">[${esc(t.game)}]</span> ${badge(t.cat||'other')}${t.video?' 🎬':''}
+        <a href="${esc(t.url)}" target="_blank">${esc(t.text.slice(0,90))}${t.text.length>90?'…':''}</a>
+        <div class="d">${esc(t.date)}${t.replies?' · '+t.replies+'条回复':''}</div></div>`;
+    }
+    let vh='';
+    for(const v of (d.videos||[]).filter(pass).slice(0,20)){
+      vh+=`<div class="item"><b style="color:var(--gold)">${(v.views??0).toLocaleString()}▶</b>
+        <span style="color:var(--acc);font-size:11px">[${esc(v.game)}]</span> ${badge(v.cat||'other')}
+        <a href="https://youtu.be/${v.videoId}" target="_blank">${esc(v.title.slice(0,80))}</a>
+        <div class="d">${v.published}</div></div>`;
+    }
+    $('#buzzTweets').innerHTML=th||'<div class="item d">该类别暂无推文 (nitter可能限流, 稍后再试)</div>';
+    $('#buzzVideos').innerHTML=vh||'<div class="item d">该类别暂无视频</div>';
+    $('#buzzBody').style.display='block';
+}
+
+let MY='';
+
+let roadmapLoaded=false, digestLoaded=false;
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  $('#page-monitor').style.display=name==='monitor'?'':'none';
+  $('#page-roadmap').style.display=name==='roadmap'?'':'none';
+  $('#page-digest').style.display=name==='digest'?'':'none';
+  if(name==='roadmap'&&!roadmapLoaded){roadmapLoaded=true;loadRoadmap()}
+  if(name==='digest'&&!digestLoaded){digestLoaded=true;loadDigestList()}
+  location.hash=name==='monitor'?'':'#'+name;
+}
+
+// ---------- 周报生成与存档 ----------
+async function loadDigestList(){
+  try{
+    const d=await api('/api/digest/list');
+    $('#dgList').className='';
+    $('#dgList').innerHTML=d.length
+      ?d.map(r=>`<button style="margin:0 6px 6px 0" onclick="openDigest('${r.file}')">📄 ${r.date}</button>`).join('')
+      :'<div class="d" style="color:var(--sub)">暂无存档, 点上方「生成本周报」</div>';
+  }catch(e){$('#dgList').innerHTML='<span class="err">'+esc(e.message)+'</span>'}
+}
+async function openDigest(f){
+  try{
+    const d=await api('/api/digest/get?f='+encodeURIComponent(f));
+    if(d.error){alert(d.error);return}
+    $('#dgText').textContent=d.text;
+    $('#dgText').style.display='block';
+    $('#dgCopy').style.display='';
+  }catch(e){alert(e.message)}
+}
+async function runDigest(btn){
+  btn.disabled=true;btn.textContent='生成中…';
+  $('#dgLog').style.display='block';$('#dgLog').textContent='启动中…';
+  try{await api('/api/digest/run'+($('#dgX').checked?'?x=1':''))}catch(e){}
+  pollDigest(btn);
+}
+async function pollDigest(btn){
+  try{
+    const s=await api('/api/digest/status');
+    $('#dgLog').textContent=s.log||'';
+    $('#dgLog').scrollTop=1e9;
+    if(s.building){setTimeout(()=>pollDigest(btn),3000);return}
+    btn.disabled=false;btn.textContent='生成本周报';
+    if(s.error){$('#dgLog').textContent+='\n❌ '+s.error;return}
+    await loadDigestList();
+    const list=await api('/api/digest/list');
+    if(list.length)openDigest(list[0].file);
+    roadmapLoaded=false; // 事件可能更新, 下次进roadmap重新拉
+  }catch(e){
+    btn.disabled=false;btn.textContent='生成本周报';
+    $('#dgLog').textContent+='\n❌ '+e.message;
+  }
+}
+function copyDigest(btn){
+  navigator.clipboard.writeText($('#dgText').textContent)
+    .then(()=>{btn.textContent='已复制 ✓';setTimeout(()=>btn.textContent='复制全文',1500)});
+}
+
+let RM_ROWS=null, rmYear=(new Date()).getFullYear();
+function rmShiftYear(d){
+  rmYear+=d;
+  if(RM_ROWS)renderRoadmap(RM_ROWS);
+}
+
+async function loadRoadmap(btn){
+  if(btn){btn.disabled=true;btn.textContent='加载中…'}
+  try{
+    if(!Object.keys(CHARTS.grossing).length){try{CHARTS=await api('/api/charts')}catch(e){}}
+    const d=await api('/api/roadmap');
+    RM_ROWS=d;
+    renderRoadmap(d);
+    if(btn){btn.textContent='刷新';btn.disabled=false}
+  }catch(e){
+    if(btn){btn.textContent='失败, 点击重试';btn.disabled=false}
+    else $('#roadmapBody').innerHTML='<div class="loading"><span class="err">加载失败: '+esc(e.message)+'</span></div>';
+  }
+}
+
+function renderRoadmap(rows){
+  const DAY=86400000;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const start=new Date(rmYear,0,1), end=new Date(rmYear+1,0,1);
+  const span=end-start;
+  const laneW=3900; // 12个月 x 325px
+  const px=d=>((new Date(d)-start)/span*laneW).toFixed(1)+'px';
+  const inYear=d=>{const x=new Date(d);return x>=start&&x<end};
+  const md=d=>{const x=new Date(d);return (x.getMonth()+1)+'/'+x.getDate()};
+  // 排序: 自家游戏置顶, 其余按当前畅销榜排名(热门在前), 未进榜的按预计更新日临近程度
+  const sorted=[...rows].filter(r=>r.appId).sort((a,b)=>{
+    if(a.cn===MY)return -1; if(b.cn===MY)return 1;
+    const ra=CHARTS.grossing[a.appId]||999, rb=CHARTS.grossing[b.appId]||999;
+    if(ra!==rb)return ra-rb;
+    return (a.nextEstimate||'9999')<(b.nextEstimate||'9999')?-1:1;
+  });
+  // 刻度: 月界线+月名(上排), 每周一细线+具体日期(下排)
+  let ticks='';
+  for(let m=new Date(rmYear,0,1);m<end;m=new Date(m.getFullYear(),m.getMonth()+1,1)){
+    ticks+=`<div style="position:absolute;left:${px(m)};top:0;bottom:0;border-left:1px solid #343950"></div>
+      <div style="position:absolute;left:${px(m)};top:2px;font-size:11px;color:var(--txt);padding-left:4px;font-weight:600">${m.getMonth()+1}月</div>`;
+  }
+  const w0=new Date(+start+((8-start.getDay())%7||7)*DAY); // 第一个周一
+  for(let w=new Date(w0);w<end;w=new Date(+w+7*DAY)){
+    if(w.getDate()!==1)ticks+=`<div style="position:absolute;left:${px(w)};top:30px;bottom:0;border-left:1px solid #232736"></div>`;
+    ticks+=`<div style="position:absolute;left:${px(w)};top:17px;font-size:9px;color:var(--sub);transform:translateX(-50%)">${md(w)}</div>`;
+  }
+  let todayMark='';
+  if(inYear(today)){
+    todayMark=`<div style="position:absolute;left:${px(today)};top:0;bottom:0;border-left:2px solid var(--gold);opacity:.7"></div>
+      <div style="position:absolute;left:${px(today)};bottom:2px;font-size:10px;color:var(--gold);padding-left:3px">今天 ${md(today)}</div>`;
+  }
+  let h=`<div id="rmScroll" style="overflow-x:auto;background:var(--card);border:1px solid #2a2e3f;border-radius:12px">
+    <div id="rmChart" style="position:relative;width:${130+laneW+30}px;padding:34px 0 12px">
+    <div style="position:absolute;left:130px;width:${laneW}px;top:0;bottom:0;pointer-events:none">
+      ${ticks}
+      ${todayMark}
+    </div>`;
+  for(const r of sorted){
+    let dots='';
+    for(const e of r.history){
+      if(!inYear(e.date))continue;
+      const major=/^\d+\.\d+\.0$|^\d+\.\d+$/.test(e.version);
+      const tip=`${r.cn}｜v${e.version}｜${e.date} 上线${e.notes?'｜'+e.notes.slice(0,240):''}`;
+      dots+=`<div class="rmdot" data-tip="${esc(tip)}"
+        style="left:${px(e.date)};width:${major?11:7}px;height:${major?11:7}px;border-radius:50%;background:${major?'var(--acc)':'var(--sub)'}"></div>`;
+    }
+    for(const mn of (r.manual||[])){
+      if(!mn.date||!inYear(mn.date))continue;
+      dots+=`<div class="rmdot" data-tip="${esc(`${r.cn}｜${mn.label||'官宣节点'}｜${mn.date}${mn.est?' (预估)':''}`)}"
+        style="left:${px(mn.date)};width:11px;height:11px;background:var(--gold);transform:translate(-50%,-50%) rotate(45deg)"></div>`;
+    }
+    for(const ev of (r.events||[])){
+      if(!ev.date||!inYear(ev.date))continue;
+      const kind=ev.kind||'mkt';
+      let st;
+      if(kind==='mkt'){ // 上排: 紫=线下实心/联动空心
+        st='top:22%;'+((ev.type||'').includes('线下')?'background:#c084fc':'border:2px solid #c084fc');
+      }else if(kind==='alert'){ // 上排: 红=舆情警报
+        st='top:22%;background:var(--bad)';
+      }else if(kind==='x'){ // 下排: 青=X热门推文
+        st='top:78%;background:#22d3ee';
+      }else{ // 下排: 橙=YouTube热门
+        st='top:78%;background:#ffa94d';
+      }
+      dots+=`<div class="rmdot rmev" data-url="${esc(ev.url||'')}"
+        data-tip="${esc(`${r.cn}｜${ev.type||'营销事件'}｜${ev.date}｜${ev.desc||''}${ev.url?'｜🔗 点击打开原文':''}`)}"
+        style="left:${px(ev.date)};width:9px;height:9px;border-radius:50%;cursor:pointer;${st}"></div>`;
+    }
+    if(r.nextEstimate&&inYear(r.nextEstimate)){
+      dots+=`<div class="rmdot" data-tip="${esc(`${r.cn}｜下个版本(推算)｜预计 ${r.nextEstimate} 前后｜依据${r.cadenceSource==='config'?'手动配置':'历史推算'}的${r.cadence}天周期, 官宣为准`)}"
+        style="left:${px(r.nextEstimate)};width:11px;height:11px;border-radius:50%;border:2px dashed var(--good)"></div>`;
+    }
+    const rk=CHARTS.grossing[r.appId];
+    h+=`<div style="display:flex;align-items:center;height:30px;position:relative">
+      <div style="width:130px;flex:none;position:sticky;left:0;z-index:6;background:var(--card);align-self:stretch;display:flex;align-items:center;font-size:12px;${r.cn===MY?'color:var(--gold);font-weight:600':''};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:12px;box-sizing:border-box">${r.cn===MY?'⭐ ':''}${esc(r.cn)}${rk?`&nbsp;<span style="color:${rk<=10?'var(--good)':'var(--sub)'};font-size:10px">#${rk}</span>`:''}</div>
+      <div style="width:${laneW}px;flex:none;position:relative;height:100%;border-bottom:1px dashed #232736">${dots}</div>
+    </div>`;
+  }
+  h+=`</div></div><div style="font-size:11px;color:var(--sub);margin-top:6px">
+    中排: ● 蓝=大版本(x.y.0)　● 灰=热修/小版本　◆ 金=手动登记官宣节点　○ 绿虚线=推算的下个版本<br>
+    上排: ● 紫=线下活动　○ 紫圈=联动合作　● 红=舆情警报　｜　下排: ● 青=X热门推文　● 橙=YouTube热门视频<br>
+    (彩色事件点来自每期周报的AI甄别存档, 点击打开原推文/视频/评论页)</div>`;
+  $('#roadmapBody').innerHTML=h;
+  $('#roadmapBody').style.display='block';
+  $('#rmYearLbl').textContent=rmYear+'年';
+  const sc=$('#rmScroll');
+  if(sc){
+    sc.scrollLeft=inYear(today)?Math.max(0,130+parseFloat(px(today))-sc.clientWidth*0.45):0;
+  }
+  bindRoadmapTips();
+}
+
+function bindRoadmapTips(){
+  let tip=$('#rmTip');
+  if(!tip){
+    tip=document.createElement('div'); tip.id='rmTip';
+    document.body.appendChild(tip);
+  }
+  const chart=$('#rmChart');
+  chart.addEventListener('mouseover',e=>{
+    const d=e.target.closest('.rmdot'); if(!d)return;
+        const parts=(d.dataset.tip||'').split('｜');
+    tip.innerHTML='<b>'+esc(parts[0])+(parts[1]?'　'+esc(parts[1]):'')+'</b>'+parts.slice(2).map(x=>'<br>'+esc(x)).join('');
+    tip.style.display='block';
+    const rc=d.getBoundingClientRect(), tw=tip.offsetWidth;
+    let x=rc.left+rc.width/2-tw/2;
+    x=Math.max(8,Math.min(x,innerWidth-tw-8));
+    tip.style.left=x+'px';
+    const th=tip.offsetHeight;
+    tip.style.top=(rc.top-th-8<8?rc.bottom+8:rc.top-th-8)+'px';
+  });
+  chart.addEventListener('mouseout',e=>{
+    if(e.target.closest('.rmdot'))tip.style.display='none';
+  });
+  chart.addEventListener('click',e=>{
+    const d=e.target.closest('.rmev');
+    if(d&&d.dataset.url)window.open(d.dataset.url,'_blank');
+  });
+}
+
+api('/api/games').then(async g=>{
+  GAMES=g;
+  MY='二重螺旋';
+  await loadAll();
+  const dna=GAMES.find(x=>x.cn===MY); if(dna)showDetail(dna);
+});
+if(location.hash==='#roadmap'||location.hash==='#digest')switchTab(location.hash.slice(1));
+setInterval(()=>loadAll(),10*60*1000);
+</script>
+</body>
+</html>

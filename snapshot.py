@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-日本二游竞品监测 - 每日快照
+日本二游监测 - 每日快照
 抓取: ①日区畅销榜/免费榜排名 ②App版本与评分 ③最新用户评论 ④官方YouTube动态
 产出: data/snapshots/YYYY-MM-DD.json  (每天一份, 供周报聚合)
 用法: python3 snapshot.py
@@ -11,6 +11,10 @@ from datetime import datetime, date
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 CFG = json.load(open(os.path.join(BASE, "config.json")))
+# 本机私密配置 (API key等, 不进git): config.local.json 覆盖合并
+_local = os.path.join(BASE, "config.local.json")
+if os.path.exists(_local):
+    CFG.update(json.load(open(_local)))
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0 Safari/537.36"
 
 
@@ -100,10 +104,67 @@ def get_reviews(app_id, count=50):
     return []
 
 
-# ---------- ④ 官方YouTube最新视频 (RSS, 走代理) ----------
+# ---------- ④ 官方YouTube最新视频 (Data API优先, RSS兜底) ----------
+def get_youtube_api(channel_id):
+    """用 YouTube Data API v3 抓频道最新视频. 需要 config.local.json 里的 youtube_api_key.
+    返回 None 表示无 key/调用失败(让调用方兜底RSS), 返回 [] 表示频道确实没视频."""
+    key = CFG.get("youtube_api_key") or os.environ.get("YOUTUBE_API_KEY")
+    if not key:
+        return None
+    proxy = CFG.get("proxy_for_youtube")
+    # ① search.list: 频道最新15个视频 (order=date)
+    url = (f"https://www.googleapis.com/youtube/v3/search"
+           f"?part=snippet&channelId={channel_id}&order=date&maxResults=15&type=video&key={key}")
+    raw = fetch(url, proxy=proxy)
+    if not raw:
+        return None
+    try:
+        items = json.loads(raw).get("items", [])
+    except Exception:
+        return None
+    if not items:
+        return []
+    ids = [it["id"]["videoId"] for it in items if it.get("id", {}).get("videoId")]
+    # ② videos.list: 批量拿观看数 (statistics)
+    stats = {}
+    if ids:
+        url2 = (f"https://www.googleapis.com/youtube/v3/videos"
+                f"?part=statistics&id={','.join(ids)}&key={key}")
+        raw2 = fetch(url2, proxy=proxy)
+        if raw2:
+            try:
+                stats = {v["id"]: v.get("statistics", {}).get("viewCount")
+                         for v in json.loads(raw2).get("items", [])}
+            except Exception:
+                pass
+    out = []
+    for it in items:
+        vid = it.get("id", {}).get("videoId")
+        if not vid:
+            continue
+        sn = it.get("snippet", {})
+        vc = stats.get(vid)
+        out.append({
+            "videoId": vid,
+            "title": (sn.get("title") or "")[:100],
+            "published": (sn.get("publishedAt") or "")[:10],
+            "views": int(vc) if vc and str(vc).isdigit() else None,
+        })
+    return out
+
+
 def get_youtube(channel_id):
+    # 优先 Data API v3 (有 key 时), 失败再兜底 RSS
+    if CFG.get("youtube_api_key"):
+        try:
+            out = get_youtube_api(channel_id)
+            if out:
+                return out
+        except Exception as ex:
+            print(f"  ! YT API失败 {channel_id}: {ex}", file=sys.stderr)
+    # 兜底: RSS (YouTube 2026年起对RSS收紧, 常返回404)
     url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
-    raw = fetch(url, proxy=CFG.get("proxy_for_youtube"))
+    raw = fetch(url, proxy=CFG.get("proxy_for_youtube"), retries=3)
     if not raw:
         return []
     try:
@@ -149,7 +210,7 @@ def main():
             rec["note"] = g.get("note", "无日区App")
         if g.get("yt_channel"):
             rec["youtube"] = get_youtube(g["yt_channel"])
-            time.sleep(0.5)
+            time.sleep(2.0)
         gr = rec.get("grossingRank")
         nrev = len(rec.get("reviews", []))
         nyt = len(rec.get("youtube", []))

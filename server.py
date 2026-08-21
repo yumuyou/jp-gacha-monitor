@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-日本二游竞品监测 - 本地仪表盘服务
+日本二游监测 - 本地仪表盘服务
 用法: python3 server.py            # 默认 http://127.0.0.1:8642
 浏览器抓 YouTube/X 会被CORS拦截, 所以由本服务代抓并缓存。
 接口:
@@ -383,7 +383,10 @@ def get_roadmap():
                 "events": ev_by_game.get(g["cn"], []),  # 营销事件 [{date,type,desc,url}]
             })
         return out
-    return cached("roadmap", 3600, _do)
+    # 缓存key带上events.json的mtime, 文件被外部修改(如命令行跑digest)时自动感知
+    ev_path = os.path.join(BASE, "data", "events.json")
+    ev_ver = str(int(os.path.getmtime(ev_path))) if os.path.exists(ev_path) else "0"
+    return cached(f"roadmap:v{ev_ver}", 3600, _do)
 
 
 # ---------- 周报生成 (digest.py) + 存档 ----------
@@ -510,5 +513,5 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print(f"日本二游竞品监测面板: http://127.0.0.1:{PORT}")
+    print(f"日本二游监测面板: http://127.0.0.1:{PORT}")
     ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()

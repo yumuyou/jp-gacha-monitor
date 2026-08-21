@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-日本二游竞品监测 - 周报生成
+日区二游市场表现周报
 聚合最近7天的每日快照, 生成 Markdown 周报:
   ①畅销榜排名周趋势 ②本周版本更新 ③评论舆情(评分分布+高赞评论) ④官方YouTube本周动态
 用法: python3 report.py            # 以今天为截止日, 回看7天
@@ -70,7 +70,7 @@ def main():
     latest = snaps[days[-1]]
 
     L = []
-    L.append(f"# 日本二游竞品周报  {days[0]} ~ {days[-1]}")
+    L.append(f"# 日本二游周报  {days[0]} ~ {days[-1]}")
     L.append("")
     L.append(f"> 数据来源: 日区App Store畅销榜(Top100)/iTunes元数据/日区用户评论/官方YouTube · 覆盖{len(snaps)}天快照 · 生成于 {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     L.append("")

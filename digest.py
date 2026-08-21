@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-日本二游竞品周报 - 群发精华版 (飞书)
+日本二游周报 - 群发精华版 (飞书)
 在完整版周报(report.py)之外, 生成可直接发群的纯文本:
   reports/digest_YYYY-MM-DD.txt   纯文本版 (emoji分节, 每条附原始链接, 复制即发)
 数据: 最近7天快照 + 实时抓官推互动量(X声量Top) + claude CLI中文提炼
 用法: python3 digest.py                 # 以今天为截止日
       python3 digest.py 2026-08-01     # 指定截止日
-      选项: --x 实时抓官推(调用monid, 约$0.04/次; 默认只读当日缓存, 不花钱)
-            --refresh-x 配合--x忽略当日缓存强制重抓
-            --no-x 完全跳过X板块(连缓存也不读)  --no-ai 跳过AI提炼
+      选项: (默认: 有X缓存读缓存, 没有则自动抓取)
+            --refresh-x 忽略缓存强制重抓官推
+            --no-x      完全跳过X板块  --no-ai 跳过AI提炼
 """
 import json, os, re, sys, math, time, glob, subprocess, tempfile
 import urllib.request, urllib.parse
@@ -81,38 +81,58 @@ def _parse_tw_date(s):
         return ""
 
 
+def _fetch_one_game(g, day0, day1):
+    """抓取单个游戏的官推, 返回(推文列表, cost). 失败抛异常"""
+    tmp = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+    tmp.close()
+    try:
+        subprocess.run(
+            ["monid", "run", "-p", "tikhub", "-e", "/api/v1/twitter/web/fetch_user_post_tweet",
+             "--query", json.dumps({"screen_name": g["x"]}), "-w", "90", "-o", tmp.name],
+            capture_output=True, text=True, timeout=150, env={**os.environ, "NO_COLOR": "1"})
+        d = json.load(open(tmp.name))
+        tweets = []
+        for t in d.get("timeline", []):
+            pub = _parse_tw_date(t.get("created_at", ""))
+            text = (t.get("text") or "").strip()
+            if not (day0 <= pub <= day1) or text.startswith("RT @"):
+                continue
+            media = t.get("media") or {}
+            tweets.append({
+                "game": g["cn"], "text": text[:180], "date": pub,
+                "url": f"https://x.com/{g['x']}/status/{t.get('tweet_id')}",
+                "likes": t.get("favorites"), "rts": t.get("retweets"),
+                "views": int(t["views"]) if str(t.get("views") or "").isdigit() else None,
+                "video": bool(media.get("video"))})
+        return tweets, 0.0015
+    finally:
+        os.unlink(tmp.name)
+
+
 def fetch_x_buzz(day0, day1):
-    """全竞品官推最近20条(一次调用/账号), 过滤到本周窗口, 按点赞排序"""
+    """全竞品官推最近20条(一次调用/账号), 过滤到本周窗口, 按点赞排序.
+    单个游戏失败自动重试一次, 降低偶发网络抖动丢数据."""
     tweets = []
     games = [g for g in CFG["games"] if g.get("x")]
     cost = 0.0
     for i, g in enumerate(games):
-        print(f"  X {i+1}/{len(games)} {g['cn']} (@{g['x']}) ...", flush=True)
-        tmp = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
-        tmp.close()
-        try:
-            r = subprocess.run(
-                ["monid", "run", "-p", "tikhub", "-e", "/api/v1/twitter/web/fetch_user_post_tweet",
-                 "--query", json.dumps({"screen_name": g["x"]}), "-w", "90", "-o", tmp.name],
-                capture_output=True, text=True, timeout=150, env={**os.environ, "NO_COLOR": "1"})
-            d = json.load(open(tmp.name))
-            cost += 0.0015
-            for t in d.get("timeline", []):
-                pub = _parse_tw_date(t.get("created_at", ""))
-                text = (t.get("text") or "").strip()
-                if not (day0 <= pub <= day1) or text.startswith("RT @"):
-                    continue
-                media = t.get("media") or {}
-                tweets.append({
-                    "game": g["cn"], "text": text[:180], "date": pub,
-                    "url": f"https://x.com/{g['x']}/status/{t.get('tweet_id')}",
-                    "likes": t.get("favorites"), "rts": t.get("retweets"),
-                    "views": int(t["views"]) if str(t.get("views") or "").isdigit() else None,
-                    "video": bool(media.get("video"))})
-        except Exception as ex:
-            print(f"    跳过 ({ex})")
-        finally:
-            os.unlink(tmp.name)
+        label = f"  X {i+1}/{len(games)} {g['cn']} (@{g['x']})"
+        ok = False
+        for attempt in range(2):
+            tag = "" if attempt == 0 else " (重试)"
+            print(f"{label}{tag} ...", flush=True)
+            try:
+                ts, c = _fetch_one_game(g, day0, day1)
+                tweets.extend(ts)
+                cost += c
+                ok = True
+                break
+            except Exception as ex:
+                if attempt == 0:
+                    time.sleep(2)
+                else:
+                    print(f"    跳过 ({ex})")
+        # 重试也失败才打印跳过
     print(f"  X抓取完成: {len(tweets)}条本周推文, 成本约${cost:.3f}")
     tweets.sort(key=lambda t: -(t.get("likes") or 0))
     return tweets
@@ -144,7 +164,7 @@ def build_data(end):
     D = {"day0": days[0], "day1": days[-1], "days": days}
 
     # ① 排名异动: 环比变化>=10 或 本周新进榜/掉榜
-    movers, my_row = [], None
+    movers, my_row, all_rows = [], None, []
     for g in CFG["games"]:
         name = g["cn"]
         cur, pre = rank_vals(snaps, name), rank_vals(prev, name) if prev else []
@@ -153,6 +173,7 @@ def build_data(end):
         today_rank = cur[-1]
         row = {"name": name, "best": b, "avg": a, "prevAvg": pa, "delta": delta,
                "today": today_rank, "trend": [v for v in cur]}
+        all_rows.append(row)
         if name == MY:
             my_row = row
         if delta is not None and abs(delta) >= 10:
@@ -165,7 +186,9 @@ def build_data(end):
             row["kind"] = "exit"
             movers.append(row)
     movers.sort(key=lambda r: -(abs(r["delta"]) if r["delta"] else (100 - (r["avg"] or 100))))
-    D["movers"], D["my"] = movers[:8], my_row
+    top_now = [r for r in all_rows if r["best"]]
+    top_now.sort(key=lambda r: r["best"])
+    D["movers"], D["my"], D["top_now"] = movers[:12], my_row, top_now[:10]
 
     # ② 本周版本更新
     updates = []
@@ -224,26 +247,45 @@ def build_data(end):
                                         "url": f"https://youtu.be/{v['videoId']}"}
     D["yt_top"] = sorted(yt.values(), key=lambda v: -(v.get("views") or 0))[:5]
 
-    # ⑤ X 声量 + 线下/联动候选 (默认不调用monid, 只读当日缓存; 加 --x 才实时抓取)
+    # ⑤ X 声量 + 线下/联动候选
+    # 策略: 有有效缓存优先读; 否则默认自动抓取; --no-x 显式跳过; --refresh-x 强制重抓
     tweets = []
     cache = os.path.join(BASE, "data", "x_cache", f"{days[-1]}.json")
-    if "--no-x" in FLAGS:
-        pass
-    elif "--x" in FLAGS and (not os.path.exists(cache) or "--refresh-x" in FLAGS):
-        print("抓取官推声量 (约2-4分钟)...")
+    cache_valid = False
+    if os.path.exists(cache):
         try:
-            tweets = fetch_x_buzz(days[0], days[-1])
-            os.makedirs(os.path.dirname(cache), exist_ok=True)
-            json.dump(tweets, open(cache, "w"), ensure_ascii=False)
-        except Exception as ex:
-            print("X抓取失败:", ex)
-    elif os.path.exists(cache):
+            cached = json.load(open(cache))
+            cache_valid = isinstance(cached, list) and len(cached) > 0
+        except Exception:
+            cache_valid = False
+
+    if "--no-x" in FLAGS:
+        tweets = []
+    elif cache_valid and "--refresh-x" not in FLAGS:
         tweets = json.load(open(cache))
         print(f"使用X缓存 ({len(tweets)}条): {cache}")
     else:
-        print("跳过X板块 (默认不调用monid; 需要实时数据请加 --x)")
+        if "--refresh-x" in FLAGS:
+            print("强制重抓官推声量 (约2-4分钟)...")
+        else:
+            print("抓取官推声量 (约2-4分钟)...")
+        try:
+            tweets = fetch_x_buzz(days[0], days[-1])
+            if tweets:
+                os.makedirs(os.path.dirname(cache), exist_ok=True)
+                json.dump(tweets, open(cache, "w"), ensure_ascii=False)
+                print(f"  X缓存已保存 ({len(tweets)}条): {cache}")
+            else:
+                # 抓了但没数据: 不写缓存, 下次还能重试
+                print("  X抓取返回0条推文, 未写缓存 (下次运行可重试)")
+                if os.path.exists(cache):
+                    os.remove(cache)
+        except Exception as ex:
+            print("X抓取失败:", ex)
+            tweets = []
     D["x_top"] = tweets[:5]
     D["events_src"] = filter_events(tweets)
+    D["x_missing"] = not tweets
     return D
 
 
@@ -344,10 +386,14 @@ def arrow_txt(m):
 def render_text(D, AI):
     mmdd = lambda s: s[5:].replace("-", ".")
     rng = f"{mmdd(D['day0'])}~{mmdd(D['day1'])}"
-    L = [f"📊 日本二游竞品周报 ({D['day0'].replace('-', '.')} ~ {D['day1'].replace('-', '.')})"]
+    L = [f"📊 日本二游周报 ({D['day0'].replace('-', '.')} ~ {D['day1'].replace('-', '.')})"]
     L.append("━━━━━━━━━━━━━━")
     if AI.get("headline"):
         L.append(f"📌 {AI['headline']}")
+        L.append("")
+
+    if D.get("x_missing"):
+        L.append("⚠️ 本周X声量/线下活动数据缺失 (未抓取官推)")
         L.append("")
 
     if D["movers"]:
@@ -355,6 +401,16 @@ def render_text(D, AI):
         for m in D["movers"]:
             pos = f"本周最高{m['best']}位" if m["best"] else ""
             L.append(f"· {m['name']} {arrow_txt(m)} {pos}")
+        L.append("")
+
+    if D["top_now"]:
+        L.append(f"🏆 本周畅销榜Top10 (按本周最高)")
+        for i, r in enumerate(D["top_now"]):
+            delta = r["delta"]
+            chg = ""
+            if delta is not None and abs(delta) >= 10:
+                chg = " 🔺" if delta > 0 else " 🔻"
+            L.append(f"{i+1}. {r['name']} — 最高第{r['best']}位{chg}")
         L.append("")
 
     if D["updates"]:
@@ -413,14 +469,20 @@ def render_text(D, AI):
         L.append("")
 
     my = D.get("my")
-    L.append(f"⭐ {MY}")
+    obs = AI.get("observation", [])
     if my and my["avg"]:
+        # 进榜了才展示
+        L.append(f"⭐ {MY}")
         L.append(f"· 本周畅销榜均值 {my['avg']} (最高{fmt_rank(my['best'])})")
-    else:
-        L.append("· 本周未进入日区畅销榜Top100")
-    for ob in AI.get("observation", []):
-        L.append(f"· {ob}")
-    L.append("")
+        for ob in obs:
+            L.append(f"· {ob}")
+        L.append("")
+    elif obs:
+        # 没进榜但有竞品观察 → 跳过排名, 只输出洞察
+        L.append(f"💡 竞品观察")
+        for ob in obs:
+            L.append(f"· {ob}")
+        L.append("")
     L.append(f"—— 数据: 日区App Store/官方X/YouTube · {datetime.now().strftime('%m-%d %H:%M')}生成")
     return "\n".join(L)
 

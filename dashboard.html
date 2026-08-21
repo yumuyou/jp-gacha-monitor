@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="utf-8">
-<title>日本二游竞品监测面板</title>
+<title>日本二游监测面板</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 :root{--bg:#0f1117;--card:#1a1d27;--card2:#232736;--txt:#e8eaf2;--sub:#8b90a5;--acc:#7c9aff;--good:#4ade80;--bad:#f87171;--gold:#fbbf24;}
@@ -58,7 +58,7 @@ button:hover{border-color:var(--acc)}
 </style>
 </head>
 <body>
-<h1>🎌 日本二游竞品监测面板</h1>
+<h1>🎌 日本二游监测面板</h1>
 <div class="sub"><span class="dot"></span>数据每10-15分钟自动刷新 · 榜单=日区游戏类畅销榜 · <span id="upd">加载中…</span>
  <button onclick="loadAll(true)" style="margin-left:8px">立即刷新</button></div>
 
@@ -98,7 +98,7 @@ button:hover{border-color:var(--acc)}
 
 <div id="page-digest" style="display:none">
   <div class="sub" style="margin-bottom:10px">聚合最近7天快照 + 当日X缓存 + AI中文提炼, 生成可直接发飞书群的纯文本周报
-    <label style="margin-left:10px;font-size:12px;cursor:pointer"><input type="checkbox" id="dgX"> 实时抓官推 (调用monid, 约$0.04/次)</label>
+    <label style="margin-left:10px;font-size:12px;cursor:pointer"><input type="checkbox" id="dgX" checked> 实时抓官推 (调用monid, 约$0.04/次)</label>
     <button id="dgBtn" onclick="runDigest(this)" style="margin-left:8px">生成本周报</button>
     <button id="dgCopy" onclick="copyDigest(this)" style="display:none;margin-left:4px">复制全文</button></div>
   <pre id="dgLog" style="display:none;background:var(--card2);border-radius:8px;padding:10px;font-size:11px;color:var(--sub);max-height:160px;overflow:auto;white-space:pre-wrap;margin-bottom:10px"></pre>
@@ -404,8 +404,9 @@ function renderRoadmap(rows){
       if(!ev.date||!inYear(ev.date))continue;
       const kind=ev.kind||'mkt';
       let st;
-      if(kind==='mkt'){ // 上排: 紫=线下实心/联动空心
-        st='top:22%;'+((ev.type||'').includes('线下')?'background:#c084fc':'border:2px solid #c084fc');
+      if(kind==='mkt'){ // 上排: 紫=线下实心/粉=联动实心
+        const isOffline=(ev.type||'').includes('线下');
+        st='top:22%;'+(isOffline?'background:#c084fc':'background:#e879f9');
       }else if(kind==='alert'){ // 上排: 红=舆情警报
         st='top:22%;background:var(--bad)';
       }else if(kind==='x'){ // 下排: 青=X热门推文
@@ -429,7 +430,7 @@ function renderRoadmap(rows){
   }
   h+=`</div></div><div style="font-size:11px;color:var(--sub);margin-top:6px">
     中排: ● 蓝=大版本(x.y.0)　● 灰=热修/小版本　◆ 金=手动登记官宣节点　○ 绿虚线=推算的下个版本<br>
-    上排: ● 紫=线下活动　○ 紫圈=联动合作　● 红=舆情警报　｜　下排: ● 青=X热门推文　● 橙=YouTube热门视频<br>
+    上排: ● 紫=线下活动　● 粉=联动合作　● 红=舆情警报　｜　下排: ● 青=X热门推文　● 橙=YouTube热门视频<br>
     (彩色事件点来自每期周报的AI甄别存档, 点击打开原推文/视频/评论页)</div>`;
   $('#roadmapBody').innerHTML=h;
   $('#roadmapBody').style.display='block';

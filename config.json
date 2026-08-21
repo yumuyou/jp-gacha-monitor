@@ -303,6 +303,204 @@
       "origin": "CN",
       "note": "日区未上线",
       "roadmap": []
+    },
+    {
+      "cn": "碧蓝幻想",
+      "jp": "グランブルーファンタジー",
+      "appId": 852882903,
+      "x": "granbluefantasy",
+      "yt_handle": null,
+      "yt_channel": "UCBV4S3kliBSKTFswcTEhC9w",
+      "tags": "二游,抽卡,RPG,幻想",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "世界计划缤纷舞台",
+      "jp": "プロジェクトセカイ カラフルステージ！",
+      "appId": 1489932710,
+      "x": "pj_sekai",
+      "yt_handle": null,
+      "yt_channel": "UCdMGYXL38w6htx6Yf9YJa-w",
+      "tags": "二游,音游,偶像,抽卡",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "Memento Mori",
+      "jp": "メメントモリ",
+      "appId": 1611490041,
+      "x": "mementomori_boi",
+      "yt_handle": null,
+      "yt_channel": "UCQ_LN6ELte7ug9IeS1VP1bw",
+      "tags": "二游,美少女,抽卡,放置",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "巫术变体达芙妮",
+      "jp": "Wizardry Variants Daphne",
+      "appId": 1663423521,
+      "x": "Wizardry_Daphne",
+      "yt_handle": null,
+      "yt_channel": "UCdls9RA6g1y4-fbJYSu1P0A",
+      "tags": "二游,地牢,RPG,抽卡",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "迪士尼扭曲仙境",
+      "jp": "ディズニー ツイステッドワンダーランド",
+      "appId": 1477455989,
+      "x": "twst_jp",
+      "yt_handle": null,
+      "yt_channel": null,
+      "tags": "二游,女性向,卡牌,抽卡",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "刀剑乱舞",
+      "jp": "刀剣乱舞ONLINE",
+      "appId": 1044505314,
+      "x": "tkrb_ht",
+      "yt_handle": null,
+      "yt_channel": "UC56x--_QtyaWD1QptYrPMqA",
+      "tags": "二游,女性向,养成,抽卡",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "Hololive Dreams",
+      "jp": "ホロライブドリームス",
+      "appId": 6756641135,
+      "x": "hololive_dreams",
+      "yt_handle": null,
+      "yt_channel": "UCawGfU44CZxd2ZVf_VGijbA",
+      "tags": "二游,VTuber,抽卡",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "咒术回战幻影游行",
+      "jp": "呪術廻戦 ファントムパレード",
+      "appId": 1551798277,
+      "x": "jujutsuphanpara",
+      "yt_handle": null,
+      "yt_channel": "UCO94ejXzeIySeu3gje0ioVQ",
+      "tags": "二游,动漫IP,抽卡,RPG",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "转生史莱姆建国谭",
+      "jp": "転生したらスライムだった件",
+      "appId": 1565488936,
+      "x": "tensuramgame",
+      "yt_handle": null,
+      "yt_channel": "UCpFup1_-DBSM3NKcATMiiWQ",
+      "tags": "二游,动漫IP,抽卡,RPG",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "无职转生",
+      "jp": "無職転生 〜異世界行ったら本気だす〜",
+      "appId": 6754311241,
+      "x": "mushokutensei_C",
+      "yt_handle": null,
+      "yt_channel": null,
+      "tags": "二游,动漫IP,抽卡,RPG",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "七大罪光与暗之交战",
+      "jp": "七つの大罪 光と闇の交戦",
+      "appId": 1268959718,
+      "x": "7ds_grandcross",
+      "yt_handle": null,
+      "yt_channel": "UColPXjQjjdrTUXSizIDwcrA",
+      "tags": "二游,动漫IP,抽卡,RPG",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "全职猎人NEN×SURVIVOR",
+      "jp": "HUNTER×HUNTER NEN×SURVIVOR",
+      "appId": 6753738566,
+      "x": "Survivor_HxH",
+      "yt_handle": null,
+      "yt_channel": "UCRWt6vDLopIKXgT7fOIRRfQ",
+      "tags": "二游,动漫IP,抽卡",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "IDOLiSH7偶像星愿",
+      "jp": "アイドリッシュセブン",
+      "appId": 1019437222,
+      "x": "iD7Mng_Ogami",
+      "yt_handle": null,
+      "yt_channel": "UCs4ms7uVxO8wVvQoEocz8jw",
+      "tags": "二游,偶像,音游,抽卡",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "偶像梦幻祭Music",
+      "jp": "あんさんぶるスターズ！！Music",
+      "appId": 1494428618,
+      "x": "ensemble_stars",
+      "yt_handle": null,
+      "yt_channel": "UCuxfK38dUXj6oY_L4JjTCkA",
+      "tags": "二游,偶像,音游,抽卡",
+      "origin": "CN",
+      "roadmap": []
+    },
+    {
+      "cn": "游戏王Master Duel",
+      "jp": "遊戯王 マスターデュエル",
+      "appId": 1554247785,
+      "x": "YuGiOh_MD",
+      "yt_handle": null,
+      "yt_channel": "UCvP9G8Z5ndG4-GX81vhgmDg",
+      "tags": "二游,卡牌,TCG",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "SD高达G世纪永恒",
+      "jp": "SDガンダム ジージェネレーション エターナル",
+      "appId": 6692611665,
+      "x": "ggene_eternal",
+      "yt_handle": null,
+      "yt_channel": null,
+      "tags": "二游,机战,抽卡,RPG",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "超级机器人大战DD",
+      "jp": "スーパーロボット大戦DD",
+      "appId": 1443710980,
+      "x": "srw_dd_pr",
+      "yt_handle": null,
+      "yt_channel": "UCGzQl6ftCkt7pvpwMr9-O5Q",
+      "tags": "二游,机战,抽卡,RPG",
+      "origin": "JP",
+      "roadmap": []
+    },
+    {
+      "cn": "Chaos Zero Nightmare",
+      "jp": "カオスゼロナイトメア",
+      "appId": 6502326151,
+      "x": "CZN_Official_EN",
+      "yt_handle": null,
+      "yt_channel": "UCtVUqg-8ja1XCZfmGndMTog",
+      "tags": "二游,美少女,抽卡",
+      "origin": "JP",
+      "roadmap": []
     }
   ]
 }

@@ -11,3 +11,6 @@ reports/
 __pycache__/
 *.pyc
 .claude/settings.local.json
+
+# Vercel 部署入口 (不进仓库)
+api/

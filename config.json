@@ -15,7 +15,8 @@
       "tags": "二游,大世界,抽卡,RPG",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 10
     },
     {
       "cn": "原神",
@@ -27,7 +28,8 @@
       "tags": "二游,大世界,抽卡,RPG",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 9
     },
     {
       "cn": "崩坏星穹铁道",
@@ -39,7 +41,8 @@
       "tags": "二游,抽卡,美少女",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 4
     },
     {
       "cn": "鸣潮",
@@ -51,7 +54,8 @@
       "tags": "二游,大世界,抽卡,末日,RPG",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 5
     },
     {
       "cn": "异环",
@@ -63,7 +67,8 @@
       "tags": "二游,大世界,抽卡,都市,RPG",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 4
     },
     {
       "cn": "明日方舟终末地",
@@ -75,7 +80,8 @@
       "tags": "二游,大世界,抽卡,末日,RPG",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 1
     },
     {
       "cn": "绝区零",
@@ -87,7 +93,8 @@
       "tags": "二游,抽卡,都市,RPG",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 7
     },
     {
       "cn": "NIKKE",
@@ -99,7 +106,8 @@
       "tags": "二游,抽卡,放置,美少女,射击",
       "origin": "KO",
       "cadence_days": 14,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 11
     },
     {
       "cn": "蔚蓝档案",
@@ -110,7 +118,8 @@
       "yt_channel": "UCmgf8DJrAXFnU7j3u0kklUQ",
       "tags": "二游,抽卡,美少女,RPG",
       "origin": "KO",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 2
     },
     {
       "cn": "战双帕尼什",
@@ -121,7 +130,8 @@
       "yt_channel": "UC_KUFMLEn-N4_Sr9wco4tcQ",
       "tags": "二游,抽卡,美少女,末日,RPG",
       "origin": "CN",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 12
     },
     {
       "cn": "碧蓝航线",
@@ -132,7 +142,8 @@
       "yt_channel": "UCnUzafAtfncBzTml2muIUEQ",
       "tags": "二游,抽卡,放置,美少女,RPG",
       "origin": "CN",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 9
     },
     {
       "cn": "重返未来1999",
@@ -144,7 +155,8 @@
       "tags": "二游,美少女",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 10
     },
     {
       "cn": "FGO",
@@ -155,7 +167,8 @@
       "yt_channel": "UCXBgKqFxSjKADEuMLkc1Bpg",
       "tags": "二游,抽卡,RPG",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 7
     },
     {
       "cn": "燕云十六声",
@@ -166,7 +179,8 @@
       "yt_channel": "UCjdxyVRi-PLb21R5Ybj7R-w",
       "tags": "大世界,抽卡,养成",
       "origin": "CN",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 11
     },
     {
       "cn": "学园偶像大师",
@@ -177,7 +191,8 @@
       "yt_channel": "UCe3uJZIjfYwNNR0S6W3GvEA",
       "tags": "二游,偶像养成",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 5
     },
     {
       "cn": "剑与远征：启程",
@@ -188,7 +203,8 @@
       "yt_channel": "UC1fTUmrHpSkJNP_0esHzvXw",
       "tags": "放置,RPG",
       "origin": "CN",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 3
     },
     {
       "cn": "无限大",
@@ -200,7 +216,8 @@
       "tags": "二游,美少女,都市",
       "origin": "CN",
       "note": "未上线，预计2026Q3末",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": null
     },
     {
       "cn": "魔御STAR DIVE",
@@ -211,7 +228,8 @@
       "yt_channel": "UCTDprmSGHWWqR5YprA-Zxzg",
       "tags": "捉宠,二游,大世界,抽卡",
       "origin": "KO",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 4
     },
     {
       "cn": "赛马娘",
@@ -222,7 +240,8 @@
       "yt_channel": "UCAWxPGGuIfWME2KTLUmSCHw",
       "tags": "二游,抽卡,养成,美少女",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 2
     },
     {
       "cn": "七大罪Origin",
@@ -233,7 +252,8 @@
       "yt_channel": "UCT6tXw4iLM4JY5ToWNE8Wgg",
       "tags": "二游,大世界,抽卡,RPG",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 3
     },
     {
       "cn": "明日方舟",
@@ -244,7 +264,8 @@
       "yt_channel": "UCvoQlzEzqa6vQA8hq9GNNug",
       "tags": "二游,抽卡,策略,塔防",
       "origin": "CN",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 1
     },
     {
       "cn": "尘白禁区",
@@ -256,7 +277,8 @@
       "tags": "二游,抽卡,美少女,射击",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 7
     },
     {
       "cn": "交错战线",
@@ -267,7 +289,8 @@
       "yt_channel": "UCCSNPjzeMq_uSNLdh4DD7Pw",
       "tags": "二游",
       "origin": "CN",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 2
     },
     {
       "cn": "少女前线2",
@@ -279,7 +302,8 @@
       "tags": "二游,美少女",
       "origin": "CN",
       "cadence_days": 42,
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 12
     },
     {
       "cn": "炽焰天穹",
@@ -290,7 +314,8 @@
       "yt_channel": "UCtJM9OX9cWtRRxQzgvcOccA",
       "tags": "二游,美少女",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 2
     },
     {
       "cn": "洛克王国世界",
@@ -302,7 +327,8 @@
       "tags": "捉宠,二游,大世界",
       "origin": "CN",
       "note": "日区未上线",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": null
     },
     {
       "cn": "碧蓝幻想",
@@ -313,7 +339,8 @@
       "yt_channel": "UCBV4S3kliBSKTFswcTEhC9w",
       "tags": "二游,抽卡,RPG,幻想",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 3
     },
     {
       "cn": "世界计划缤纷舞台",
@@ -324,7 +351,8 @@
       "yt_channel": "UCdMGYXL38w6htx6Yf9YJa-w",
       "tags": "二游,音游,偶像,抽卡",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 9
     },
     {
       "cn": "Memento Mori",
@@ -335,7 +363,8 @@
       "yt_channel": "UCQ_LN6ELte7ug9IeS1VP1bw",
       "tags": "二游,美少女,抽卡,放置",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 10
     },
     {
       "cn": "巫术变体达芙妮",
@@ -346,7 +375,8 @@
       "yt_channel": "UCdls9RA6g1y4-fbJYSu1P0A",
       "tags": "二游,地牢,RPG,抽卡",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 10
     },
     {
       "cn": "迪士尼扭曲仙境",
@@ -357,7 +387,8 @@
       "yt_channel": null,
       "tags": "二游,女性向,卡牌,抽卡",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 3
     },
     {
       "cn": "刀剑乱舞",
@@ -368,7 +399,8 @@
       "yt_channel": "UC56x--_QtyaWD1QptYrPMqA",
       "tags": "二游,女性向,养成,抽卡",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 1
     },
     {
       "cn": "Hololive Dreams",
@@ -379,7 +411,8 @@
       "yt_channel": "UCawGfU44CZxd2ZVf_VGijbA",
       "tags": "二游,VTuber,抽卡",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 7
     },
     {
       "cn": "咒术回战幻影游行",
@@ -390,7 +423,8 @@
       "yt_channel": "UCO94ejXzeIySeu3gje0ioVQ",
       "tags": "二游,动漫IP,抽卡,RPG",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 11
     },
     {
       "cn": "转生史莱姆建国谭",
@@ -401,7 +435,8 @@
       "yt_channel": "UCpFup1_-DBSM3NKcATMiiWQ",
       "tags": "二游,动漫IP,抽卡,RPG",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 10
     },
     {
       "cn": "无职转生",
@@ -412,7 +447,8 @@
       "yt_channel": null,
       "tags": "二游,动漫IP,抽卡,RPG",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 7
     },
     {
       "cn": "七大罪光与暗之交战",
@@ -423,7 +459,8 @@
       "yt_channel": "UColPXjQjjdrTUXSizIDwcrA",
       "tags": "二游,动漫IP,抽卡,RPG",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 6
     },
     {
       "cn": "全职猎人NEN×SURVIVOR",
@@ -434,7 +471,8 @@
       "yt_channel": "UCRWt6vDLopIKXgT7fOIRRfQ",
       "tags": "二游,动漫IP,抽卡",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 12
     },
     {
       "cn": "IDOLiSH7偶像星愿",
@@ -445,7 +483,8 @@
       "yt_channel": "UCs4ms7uVxO8wVvQoEocz8jw",
       "tags": "二游,偶像,音游,抽卡",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 8
     },
     {
       "cn": "偶像梦幻祭Music",
@@ -456,7 +495,8 @@
       "yt_channel": "UCuxfK38dUXj6oY_L4JjTCkA",
       "tags": "二游,偶像,音游,抽卡",
       "origin": "CN",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 3
     },
     {
       "cn": "游戏王Master Duel",
@@ -467,7 +507,8 @@
       "yt_channel": "UCvP9G8Z5ndG4-GX81vhgmDg",
       "tags": "二游,卡牌,TCG",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 1
     },
     {
       "cn": "SD高达G世纪永恒",
@@ -478,7 +519,8 @@
       "yt_channel": null,
       "tags": "二游,机战,抽卡,RPG",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 4
     },
     {
       "cn": "超级机器人大战DD",
@@ -489,7 +531,8 @@
       "yt_channel": "UCGzQl6ftCkt7pvpwMr9-O5Q",
       "tags": "二游,机战,抽卡,RPG",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 8
     },
     {
       "cn": "Chaos Zero Nightmare",
@@ -500,7 +543,8 @@
       "yt_channel": "UCtVUqg-8ja1XCZfmGndMTog",
       "tags": "二游,美少女,抽卡",
       "origin": "JP",
-      "roadmap": []
+      "roadmap": [],
+      "anniversary_month": 10
     }
   ]
 }
